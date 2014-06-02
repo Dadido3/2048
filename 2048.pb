@@ -162,6 +162,7 @@ XIncludeFile "Includes/About.pbi"
 XIncludeFile "Includes/Choose_AI.pbi"
 XIncludeFile "Includes/AI_Dadido3.pbi"
 XIncludeFile "Includes/AI_Simple.pbi"
+XIncludeFile "Includes/AI_Random.pbi"
 
 ; ##################################################### Procedures ##################################################
 
@@ -813,8 +814,8 @@ DataSection
   Icon_AI_Choose: : IncludeBinary "Data/Icons/AI_Choose.png"
 EndDataSection
 ; IDE Options = PureBasic 5.30 Beta 1 (Windows - x64)
-; CursorPosition = 173
-; FirstLine = 154
+; CursorPosition = 164
+; FirstLine = 131
 ; Folding = ----
 ; EnableUnicode
 ; EnableXP

@@ -7,20 +7,32 @@
   <section name="data">
     <explorer view="" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2014-06-02 01:31" user="David Vogel" host="DAVIDS"/>
+    <lastopen date="2014-06-02 17:49" user="David Vogel" host="DAVIDS"/>
   </section>
   <section name="files">
     <file name="2048.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
-      <fingerprint md5="04ee0743335e60638c16dae2fa42f1cf"/>
+      <fingerprint md5="1a8d3a0291f358005612200a2571e74f"/>
+    </file>
+    <file name="Includes\AI_Dadido3.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="3256b9547031c38fce1774b6152b59ce"/>
     </file>
     <file name="Includes\AI_Simple.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
       <fingerprint md5="4def7ce72bbec7087ef8abc582db3065"/>
     </file>
-    <file name="Includes\AI_Dadido3.pbi">
+    <file name="Includes\About.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="ce996203394a36481f2b4acd8eb08043"/>
+      <fingerprint md5="8680568420701d1cfc5158f9775c49f0"/>
+    </file>
+    <file name="Includes\Choose_AI.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="60490af85e55fb1d7a726ed763950ce2"/>
+    </file>
+    <file name="Includes\AI_Random.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="be04b9fcc5770e795e0c5d588a8ae3a1"/>
     </file>
   </section>
   <section name="targets">
@@ -28,7 +40,10 @@
       <inputfile value="2048.pb"/>
       <outputfile value="2048.exe"/>
       <compiler version="PureBasic 5.30 Beta 1 (Windows - x86)"/>
+      <executable value="2048.exe"/>
       <options unicode="1" thread="1" xpskin="1" user="1" onerror="1"/>
+      <compilecount enable="1" value="36"/>
+      <buildcount enable="1" value="2"/>
     </target>
   </section>
 </project>
