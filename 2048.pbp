@@ -7,32 +7,36 @@
   <section name="data">
     <explorer view="" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2014-06-02 17:49" user="David Vogel" host="DAVIDS"/>
+    <lastopen date="2014-06-08 22:42" user="David Vogel" host="DAVIDS"/>
   </section>
   <section name="files">
     <file name="2048.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
-      <fingerprint md5="1a8d3a0291f358005612200a2571e74f"/>
-    </file>
-    <file name="Includes\AI_Dadido3.pbi">
-      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="3256b9547031c38fce1774b6152b59ce"/>
-    </file>
-    <file name="Includes\AI_Simple.pbi">
-      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="4def7ce72bbec7087ef8abc582db3065"/>
+      <fingerprint md5="5e968a84c38de5f5262fe4d6bb1a8602"/>
     </file>
     <file name="Includes\About.pbi">
-      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
       <fingerprint md5="8680568420701d1cfc5158f9775c49f0"/>
-    </file>
-    <file name="Includes\Choose_AI.pbi">
-      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="60490af85e55fb1d7a726ed763950ce2"/>
     </file>
     <file name="Includes\AI_Random.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="be04b9fcc5770e795e0c5d588a8ae3a1"/>
+      <fingerprint md5="91c9b7fdbf6282a75a89eeb8bc13ffd1"/>
+    </file>
+    <file name="Includes\AI_Settings.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="d393e81af06fd19266d25b6f4b9edde9"/>
+    </file>
+    <file name="Includes\AI_Simple.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="a4df8b996f74467735f22548be5f68b9"/>
+    </file>
+    <file name="Includes\AI_WorstCase.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="a1515b1bc4bf058b3c0626f56b234550"/>
+    </file>
+    <file name="Includes\Tuner.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="1f7db02597cad135552f06b8de4795f6"/>
     </file>
   </section>
   <section name="targets">
@@ -42,8 +46,8 @@
       <compiler version="PureBasic 5.30 Beta 1 (Windows - x86)"/>
       <executable value="2048.exe"/>
       <options unicode="1" thread="1" xpskin="1" user="1" onerror="1"/>
-      <compilecount enable="1" value="36"/>
-      <buildcount enable="1" value="2"/>
+      <compilecount enable="1" value="447"/>
+      <buildcount enable="1" value="4"/>
     </target>
   </section>
 </project>

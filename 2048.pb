@@ -3,7 +3,7 @@ UsePNGImageDecoder()
 
 EnableExplicit
 
-; ##################################################### Dokumentation / Kommentare ##################################
+; ##################################################### Documentation ###############################################
 ; 
 ; Todo:
 ;   
@@ -29,14 +29,14 @@ Enumeration
 EndEnumeration
 
 Enumeration
-  #Menu_Reset
+  #Menu_Restart
+  #Menu_Restart_With_Seed
   #Menu_Exit
   
   #Menu_AI_Start
   #Menu_AI_Stop
   #Menu_AI_Step
-  #Menu_AI_Choose
-  #Menu_AI_Delay
+  #Menu_AI_Settings
   
   #Menu_About
   
@@ -64,7 +64,7 @@ EndStructure
 Structure Main
   Quit.i
   
-  
+  Highscore.i
 EndStructure
 Global Main.Main
 
@@ -97,7 +97,8 @@ EndStructure
 Structure Game
   Array Field.i(#Field_Size, #Field_Size)
   
-  Score.i
+  Score.i             ; Current score
+  Lost.i              ; True if lost
   
   Animation.Game_Animation
 EndStructure
@@ -119,6 +120,8 @@ Structure AI_Main
   
   Mutex_ID.i
   Thread_ID.i
+  
+  Restart_With_Seed.i
 EndStructure
 Global AI_Main.AI_Main
 
@@ -126,11 +129,12 @@ Global AI_Main.AI_Main
 
 ; ##################################################### Icons ... ###################################################
 
-Global Icon_Reset = CatchImage(#PB_Any, ?Icon_Reset)
+Global Icon_Restart = CatchImage(#PB_Any, ?Icon_Restart)
+Global Icon_Restart_With_Seed = CatchImage(#PB_Any, ?Icon_Restart_With_Seed)
 Global Icon_AI_Start = CatchImage(#PB_Any, ?Icon_AI_Start)
 Global Icon_AI_Stop = CatchImage(#PB_Any, ?Icon_AI_Stop)
 Global Icon_AI_Step = CatchImage(#PB_Any, ?Icon_AI_Step)
-Global Icon_AI_Choose = CatchImage(#PB_Any, ?Icon_AI_Choose)
+Global Icon_AI_Settings = CatchImage(#PB_Any, ?Icon_AI_Settings)
 
 Define i
 Global Dim Tile_Font.i(#Tile_Font_Max_Size)
@@ -139,6 +143,7 @@ For i = 0 To #Tile_Font_Max_Size
 Next
 
 Global Font_Generic = LoadFont(#PB_Any, "Arial", 30)
+Global Font_Generic_Big = LoadFont(#PB_Any, "Arial", 40)
 
 ; ##################################################### Declares ####################################################
 
@@ -148,7 +153,7 @@ Declare   AI_Add(Name.s, *Do.Function_AI_Do)
 Declare   Field_Check_Direction(Array Field.i(2), Direction)
 
 Declare   Gamelogic_Move(Direction)
-Declare   Gamelogic_Reset()
+Declare   Gamelogic_Restart()
 
 ; ##################################################### Macros ######################################################
 
@@ -159,9 +164,12 @@ EndMacro
 ; ##################################################### Includes ####################################################
 
 XIncludeFile "Includes/About.pbi"
-XIncludeFile "Includes/Choose_AI.pbi"
-XIncludeFile "Includes/AI_Dadido3.pbi"
+XIncludeFile "Includes/AI_Settings.pbi"
+XIncludeFile "Includes/Tuner.pbi"
+
+; #### Add AI-Includes here
 XIncludeFile "Includes/AI_Simple.pbi"
+XIncludeFile "Includes/AI_WorstCase.pbi"
 XIncludeFile "Includes/AI_Random.pbi"
 
 ; ##################################################### Procedures ##################################################
@@ -202,14 +210,19 @@ EndProcedure
 Procedure AI_Thread(*Dummy)
   Protected Direction
   Protected Dim Field.i(#Field_Size,#Field_Size)
+  Protected Timer.i
   
   Repeat
     
-    If AI_Main\Delay > 1000
-      AI_Main\Delay = 1000
+    If AI_Main\Restart_With_Seed
+      RandomSeed(AI_Main\Restart_With_Seed)
+      AI_Main\Restart_With_Seed = 0
     EndIf
     
-    Delay(AI_Main\Delay)
+    While Timer + AI_Main\Delay > ElapsedMilliseconds()
+      Delay(10)
+    Wend
+    Timer = ElapsedMilliseconds()
     
     Select AI_Main\State
       Case #AI_State_Stop
@@ -286,14 +299,18 @@ Procedure Main_Window_Event_Menu()
   Protected AI_List.s
   
   Select Event_Menu
-    Case #Menu_Reset : Gamelogic_Reset()
+    Case #Menu_Restart : Gamelogic_Restart()
+    Case #Menu_Restart_With_Seed
+      AI_Main\State = #AI_State_Stop
+      AI_Main\Restart_With_Seed = Val(InputRequester("Restart", "Enter the new seed", ""))
+      RandomSeed(AI_Main\Restart_With_Seed)
+      Gamelogic_Restart()
     Case #Menu_Exit : Main\Quit = #True
     
     Case #Menu_AI_Start   : AI_Main\State = #AI_State_Start
     Case #Menu_AI_Stop    : AI_Main\State = #AI_State_Stop
     Case #Menu_AI_Step    : AI_Main\State = #AI_State_Step
-    Case #Menu_AI_Choose  : Choose_AI_Open()
-    Case #Menu_AI_Delay   : AI_Main\Delay = Val(InputRequester("Set Delay", "Set the delay in ms between steps", Str(AI_Main\Delay)))
+    Case #Menu_AI_Settings: AI_Settings_Open()
     
     Case #Menu_Key_Right  : Gamelogic_Move(#Direction_Right)
     Case #Menu_Key_Up     : Gamelogic_Move(#Direction_Up)
@@ -329,23 +346,23 @@ Procedure Main_Window_Open()
   
   Main_Window\Menu_ID = CreateImageMenu(#PB_Any, WindowID(Main_Window\ID), #PB_Menu_ModernLook)
   If Not Main_Window\Menu_ID
-    MessageRequester("D3hex", "Menü konnte nicht erstellt werden.")
+    MessageRequester("Error", "Menü konnte nicht erstellt werden.")
     CloseWindow(Main_Window\ID)
     ProcedureReturn 0
   EndIf
   
   MenuTitle("Game")
-  MenuItem(#Menu_Reset, "Restart")
+  MenuItem(#Menu_Restart, "Restart", ImageID(Icon_Restart))
+  MenuItem(#Menu_Restart_With_Seed, "Restart with Seed", ImageID(Icon_Restart_With_Seed))
   MenuBar()
   MenuItem(#Menu_Exit, "Exit")
   
   MenuTitle("AI")
-  MenuItem(#Menu_AI_Step, "Step")
-  MenuItem(#Menu_AI_Start, "Start")
-  MenuItem(#Menu_AI_Stop, "Stop")
+  MenuItem(#Menu_AI_Settings, "Settings", ImageID(Icon_AI_Settings))
   MenuBar()
-  MenuItem(#Menu_AI_Choose, "Choose")
-  MenuItem(#Menu_AI_Delay, "Set Delay")
+  MenuItem(#Menu_AI_Step, "Step", ImageID(Icon_AI_Step))
+  MenuItem(#Menu_AI_Start, "Start", ImageID(Icon_AI_Start))
+  MenuItem(#Menu_AI_Stop, "Stop", ImageID(Icon_AI_Stop))
   
   MenuTitle("?")
   MenuItem(#Menu_About, "About")
@@ -361,14 +378,15 @@ Procedure Main_Window_Open()
   
   Main_Window\ToolBar_ID = CreateToolBar(#PB_Any, WindowID(Main_Window\ID))
   If Not Main_Window\ToolBar_ID
-    MessageRequester("D3hex", "ToolBar konnte nicht erstellt werden.")
+    MessageRequester("Error", "ToolBar konnte nicht erstellt werden.")
     CloseWindow(Main_Window\ID)
     ProcedureReturn 0
   EndIf
   
-  ToolBarImageButton(#Menu_Reset, ImageID(Icon_Reset))
+  ToolBarImageButton(#Menu_Restart, ImageID(Icon_Restart))
+  ToolBarImageButton(#Menu_Restart_With_Seed, ImageID(Icon_Restart_With_Seed))
   ToolBarSeparator()
-  ToolBarImageButton(#Menu_AI_Choose, ImageID(Icon_AI_Choose))
+  ToolBarImageButton(#Menu_AI_Settings, ImageID(Icon_AI_Settings))
   ToolBarImageButton(#Menu_AI_Stop, ImageID(Icon_AI_Stop))
   ToolBarImageButton(#Menu_AI_Start, ImageID(Icon_AI_Start))
   ToolBarImageButton(#Menu_AI_Step, ImageID(Icon_AI_Step))
@@ -408,12 +426,21 @@ Procedure Main_Window_Redraw_Info()
   If StartDrawing(CanvasOutput(Main_Window\Canvas_Info))
     Box(0, 0, Width, Height, RGB(187, 173, 160))
     
+    If Game\Lost ; ! THE GAME !
+      DrawingMode(#PB_2DDrawing_AlphaBlend | #PB_2DDrawing_Transparent)
+      
+      Box(0, 0, Width, Height, RGBA(255, 255, 255, 150))
+      
+      DrawingMode(#PB_2DDrawing_Default)
+    EndIf
+    
     RoundBox(#Tile_Margin, #Tile_Margin, Width - 2*#Tile_Margin, Height - #Tile_Margin, 8, 8, RGB(200, 190, 180))
     
     DrawingFont(FontID(Font_Generic))
     DrawingMode(#PB_2DDrawing_Transparent)
     
     DrawText(2*#Tile_Margin, 2*#Tile_Margin, "Score: "+Str(Game\Score), 0)
+    DrawText(2*#Tile_Margin, 2*#Tile_Margin + Height/2 - 5, "Highscore: "+Str(Main\Highscore), 0)
     
     StopDrawing()
   EndIf
@@ -508,6 +535,14 @@ Procedure Main_Window_Redraw_Field()
     
     UnlockMutex(AI_Main\Mutex_ID)
     
+    If Game\Lost ; ! THE GAME !
+      DrawingMode(#PB_2DDrawing_AlphaBlend | #PB_2DDrawing_Transparent)
+      
+      DrawingFont(FontID(Font_Generic_Big))
+      Box(0, 0, Width, Height, RGBA(255, 255, 255, 150))
+      DrawText(Width/2 - TextWidth("Game over!")/2, Height/2 - TextHeight("Game over!")/2, "Game over!", RGBA(0, 0, 0, 200))
+    EndIf
+    
     StopDrawing()
   EndIf
 EndProcedure
@@ -529,7 +564,7 @@ Procedure.i Field_Check_Direction(Array Field.i(2), Direction)
         If jx >= 0 And jy >= 0 And jx < #Field_Size And jy < #Field_Size
           If Field(ix, iy) And Field(jx, jy) = 0
             ProcedureReturn #True ; #### Found an empty tile beneath
-          ElseIf Field(ix, iy) And Field(ix, iy) = Field(jx, jy)
+          ElseIf Field(ix, iy) > 0 And Field(ix, iy) = Field(jx, jy)
             ProcedureReturn #True ; #### Found mergable tiles
           EndIf
         EndIf
@@ -560,10 +595,12 @@ Procedure Gamelogic_Place_Random()
   
   If SelectElement(Empty_Tile(), Random(ListSize(Empty_Tile())-1))
     
-    Select Random(1)
-      Case 0 : Game\Field(Empty_Tile()\X,Empty_Tile()\Y) = 2 ;Pow(2, Random(5)+1)
-      Case 1 : Game\Field(Empty_Tile()\X,Empty_Tile()\Y) = 4
+    Select Random(9)
+      Case 0 To 8 : Game\Field(Empty_Tile()\X,Empty_Tile()\Y) = 2 ;Pow(2, Random(5)+1)
+      Case 9 : Game\Field(Empty_Tile()\X,Empty_Tile()\Y) = 4
     EndSelect
+    
+    ;Game\Field(Empty_Tile()\X,Empty_Tile()\Y) = 3
     
     Game\Animation\New_Tile\X = Empty_Tile()\X
     Game\Animation\New_Tile\Y = Empty_Tile()\Y
@@ -588,14 +625,14 @@ Procedure Gamelogic_Move_Helper(Direction)
   
   LockMutex(AI_Main\Mutex_ID)
   
-  ; #### Reset transition array for animations
+  ; #### Restart transition array for animations
   For ix = 0 To #Field_Size-1
     For iy = 0 To #Field_Size-1
       Game\Animation\Transition(ix,iy)\X = ix
       Game\Animation\Transition(ix,iy)\Y = iy
     Next
   Next
-  ; #### Reset additional array for animations
+  ; #### Restart additional array for animations
   For ix = 0 To #Field_Size-1
     For iy = 0 To #Field_Size-1
       Game\Animation\Additional_Tile(ix,iy)\Value = 0
@@ -632,6 +669,9 @@ Procedure Gamelogic_Move_Helper(Direction)
         Game\Field(cx,cy) + Game\Field(tx,ty)
         Game\Field(tx,ty) = 0
         Game\Score + Game\Field(cx,cy)
+        If Main\Highscore < Game\Score
+          Main\Highscore = Game\Score
+        EndIf
         Main_Window\Canvas_Info_Redraw = #True
         Main_Window\Canvas_Field_Redraw = #True
         Moved = #True
@@ -692,38 +732,53 @@ Procedure Gamelogic_Move_Helper(Direction)
 EndProcedure
 
 Procedure Gamelogic_Move(Direction)
+  Protected i, Found
   
   If Gamelogic_Move_Helper(Direction)
     Gamelogic_Place_Random()
   EndIf
   
+  ; #### Check if there is any movable direction left
+  For i = 0 To 3
+    If Field_Check_Direction(Game\Field(), i)
+      Found = #True
+      Break
+    EndIf
+  Next
+  If Not Found
+    Game\Lost = #True
+    AI_Main\State = #AI_State_Stop
+  EndIf
+  
 EndProcedure
 
-Procedure Gamelogic_Reset()
+Procedure Gamelogic_Restart()
   Protected ix, iy
   
   LockMutex(AI_Main\Mutex_ID)
   
-  ; #### Reset transition array for animations
+  ; #### Restart transition array for animations
   For ix = 0 To #Field_Size-1
     For iy = 0 To #Field_Size-1
       Game\Animation\Transition(ix,iy)\X = ix
       Game\Animation\Transition(ix,iy)\Y = iy
     Next
   Next
-  ; #### Reset additional array for animations
+  ; #### Restart additional array for animations
   For ix = 0 To #Field_Size-1
     For iy = 0 To #Field_Size-1
       Game\Animation\Additional_Tile(ix,iy)\Value = 0
     Next
   Next
   
-  ; #### Reset Field
+  ; #### Restart Field
   For ix = 0 To #Field_Size-1
     For iy = 0 To #Field_Size-1
       Game\Field(ix,iy) = 0
     Next
   Next
+  
+  Game\Lost = #False
   
   Game\Score = 0
   Main_Window\Canvas_Info_Redraw = #True
@@ -738,6 +793,9 @@ EndProcedure
 Procedure Configuration_Save(Filename.s)
   If CreatePreferences(Filename, #PB_Preference_GroupSeparator)
     
+    PreferenceGroup("Main")
+    WritePreferenceInteger("Highscore", Main\Highscore)
+    
     PreferenceGroup("AI")
     If AI_Main\AI
       WritePreferenceString("Name", AI_Main\AI\Name)
@@ -751,6 +809,9 @@ EndProcedure
 
 Procedure Configuration_Load(Filename.s)
   OpenPreferences(Filename, #PB_Preference_GroupSeparator)
+  
+  PreferenceGroup("Main")
+  Main\Highscore = ReadPreferenceInteger("Highscore", 0)
   
   PreferenceGroup("AI")
   If Not AI_Change_By_Name(ReadPreferenceString("Name", ""))
@@ -771,7 +832,9 @@ AI_Main\Thread_ID = CreateThread(@AI_Thread(), 0)
 
 Main_Window_Open()
 
-Gamelogic_Reset()
+;Tuner_Window_Open()
+
+Gamelogic_Restart()
 
 ; ##################################################### Main ########################################################
 
@@ -790,7 +853,8 @@ Repeat
   EndIf
   
   About_Main()
-  Choose_AI_Main()
+  AI_Settings_Main()
+  Tuner_Main()
   
 Until Main\Quit
 
@@ -806,16 +870,17 @@ Configuration_Save(SHGetFolderPath(#CSIDL_APPDATA)+"\D3\2048\Settings.txt")
 ; ##################################################### Data Sections ###############################################
 
 DataSection
-  Icon_Reset:     : IncludeBinary "Data/Icons/Reset.png"
+  Icon_Restart:           : IncludeBinary "Data/Icons/Restart.png"
+  Icon_Restart_With_Seed: : IncludeBinary "Data/Icons/Restart_With_Seed.png"
   
-  Icon_AI_Start:  : IncludeBinary "Data/Icons/AI_Start.png"
-  Icon_AI_Stop:   : IncludeBinary "Data/Icons/AI_Stop.png"
-  Icon_AI_Step:   : IncludeBinary "Data/Icons/AI_Step.png"
-  Icon_AI_Choose: : IncludeBinary "Data/Icons/AI_Choose.png"
+  Icon_AI_Start:          : IncludeBinary "Data/Icons/AI_Start.png"
+  Icon_AI_Stop:           : IncludeBinary "Data/Icons/AI_Stop.png"
+  Icon_AI_Step:           : IncludeBinary "Data/Icons/AI_Step.png"
+  Icon_AI_Settings:       : IncludeBinary "Data/Icons/AI_Settings.png"
 EndDataSection
 ; IDE Options = PureBasic 5.30 Beta 1 (Windows - x64)
-; CursorPosition = 164
-; FirstLine = 131
+; CursorPosition = 169
+; FirstLine = 127
 ; Folding = ----
 ; EnableUnicode
 ; EnableXP
