@@ -7,7 +7,7 @@
   <section name="data">
     <explorer view="" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2016-07-02 13:48" user="David Vogel" host="DAVIDS"/>
+    <lastopen date="2016-07-02 14:48" user="David Vogel" host="DAVIDS"/>
   </section>
   <section name="files">
     <file name="2048.pb">
@@ -36,7 +36,7 @@
     </file>
     <file name="Includes\Helper.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="1a9f1574c1303fdda7583f27a80cd22c"/>
+      <fingerprint md5="d4fbad978309841713e624cade504096"/>
     </file>
     <file name="Includes\Tuner.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
@@ -51,7 +51,7 @@
       <executable value="Distribution\Windows\x86\2048.exe"/>
       <options unicode="1" thread="1" xpskin="1" user="1" onerror="1"/>
       <icon enable="1">Data\Icons\2048.ico</icon>
-      <compilecount enable="1" value="533"/>
+      <compilecount enable="1" value="534"/>
       <buildcount enable="1" value="8"/>
     </target>
   </section>

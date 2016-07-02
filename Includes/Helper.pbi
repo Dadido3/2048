@@ -107,7 +107,7 @@ Module Helper
         ProcedureReturn SHGetFolderPath(#CSIDL_APPDATA) + "\"
         
       CompilerCase #PB_OS_Linux
-        ProcedureReturn GetHomeDirectory() + "/." ; Not tested
+        ProcedureReturn GetHomeDirectory() + "." ; Not tested
         
       CompilerCase #PB_OS_MacOS
         ProcedureReturn GetHomeDirectory() + "Library/Preferences/" ; Not tested
@@ -124,7 +124,7 @@ Module Helper
         ProcedureReturn SHGetFolderPath(#CSIDL_APPDATA) + "\"
         
       CompilerCase #PB_OS_Linux
-        ProcedureReturn GetHomeDirectory() + "/." ; Not tested
+        ProcedureReturn GetHomeDirectory() + "." ; Not tested
         
       CompilerCase #PB_OS_MacOS
         ProcedureReturn GetHomeDirectory() + "Library/Application Support/" ; Not tested
@@ -181,8 +181,8 @@ Module Helper
 EndModule
 
 ; IDE Options = PureBasic 5.42 LTS (Windows - x64)
-; CursorPosition = 41
-; FirstLine = 1
+; CursorPosition = 114
+; FirstLine = 91
 ; Folding = --
 ; EnableUnicode
 ; EnableXP
