@@ -7,16 +7,16 @@
   <section name="data">
     <explorer view="" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2016-07-02 13:25" user="David Vogel" host="DAVIDS"/>
+    <lastopen date="2016-07-02 13:48" user="David Vogel" host="DAVIDS"/>
   </section>
   <section name="files">
     <file name="2048.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
-      <fingerprint md5="520f74d77b90813672ed5c9b68706d00"/>
+      <fingerprint md5="05f84578357c41a0a1e1582d5453ebbc"/>
     </file>
     <file name="Includes\About.pbi">
-      <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
-      <fingerprint md5="8680568420701d1cfc5158f9775c49f0"/>
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="08586bf575d6cc43515e377a9094df4d"/>
     </file>
     <file name="Includes\AI_Random.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
@@ -34,13 +34,13 @@
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
       <fingerprint md5="a1515b1bc4bf058b3c0626f56b234550"/>
     </file>
-    <file name="Includes\Tuner.pbi">
-      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="1f7db02597cad135552f06b8de4795f6"/>
-    </file>
     <file name="Includes\Helper.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
       <fingerprint md5="1a9f1574c1303fdda7583f27a80cd22c"/>
+    </file>
+    <file name="Includes\Tuner.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="1f7db02597cad135552f06b8de4795f6"/>
     </file>
   </section>
   <section name="targets">
@@ -51,8 +51,8 @@
       <executable value="Distribution\Windows\x86\2048.exe"/>
       <options unicode="1" thread="1" xpskin="1" user="1" onerror="1"/>
       <icon enable="1">Data\Icons\2048.ico</icon>
-      <compilecount enable="1" value="528"/>
-      <buildcount enable="1" value="7"/>
+      <compilecount enable="1" value="533"/>
+      <buildcount enable="1" value="8"/>
     </target>
   </section>
 </project>

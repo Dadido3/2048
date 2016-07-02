@@ -7,6 +7,25 @@ EnableExplicit
 ; 
 ; Todo:
 ;   
+; History:
+; - V0.000 (02.06.2014)
+;   - Project started
+; 
+; - V0.??? (08.06.2014)
+;   - Added "Game over" message
+;   - Improved AI_Simple
+;   - Added restart with a specific seed
+;   - Added tuner to optimize AI parameters with some sort of genetic algorithm
+;   - Other small improvements
+;
+; - V1.000 (02.07.2016)
+;   - Added program icon
+;   - Seed can now contain any character
+;   - Changed binary output to distribution folder
+;   - Code should be compatble with Linux and macOS from now on
+;   - Game starts with two random tiles
+; 
+; 
 ; ##################################################### Includes ####################################################
 
 ; ##################################################### Prototypes ##################################################
@@ -14,6 +33,9 @@ EnableExplicit
 Prototype.i Function_AI_Do(Array Field.i(2))
 
 ; ##################################################### Constants ###################################################
+#Version = 1000
+
+#Software_Name = "2048"
 
 #Field_Size = 4
 #Tile_Size = 100 ; px
@@ -338,7 +360,7 @@ Procedure Main_Window_Open()
   Width = #Field_Size * #Tile_Size + (#Field_Size+1) * #Tile_Margin
   Height = #Field_Size * #Tile_Size + (#Field_Size+1) * #Tile_Margin + 150
   
-  Main_Window\ID = OpenWindow(#PB_Any, 0, 0, Width, Height, "2048", #PB_Window_SystemMenu | #PB_Window_TitleBar | #PB_Window_ScreenCentered | #PB_Window_MinimizeGadget)
+  Main_Window\ID = OpenWindow(#PB_Any, 0, 0, Width, Height, #Software_Name + " V"+StrF(#Version*0.001,2), #PB_Window_SystemMenu | #PB_Window_TitleBar | #PB_Window_ScreenCentered | #PB_Window_MinimizeGadget)
   
   If Not Main_Window\ID
     ProcedureReturn 0
@@ -346,7 +368,7 @@ Procedure Main_Window_Open()
   
   SmartWindowRefresh(Main_Window\ID, 1)
   
-  Main_Window\Menu_ID = CreateImageMenu(#PB_Any, WindowID(Main_Window\ID), #PB_Menu_ModernLook)
+  Main_Window\Menu_ID = CreateImageMenu(#PB_Any, WindowID(Main_Window\ID))
   If Not Main_Window\Menu_ID
     MessageRequester("Error", "Menü konnte nicht erstellt werden.")
     CloseWindow(Main_Window\ID)
@@ -903,8 +925,8 @@ DataSection
   Icon_AI_Settings:       : IncludeBinary "Data/Icons/AI_Settings.png"
 EndDataSection
 ; IDE Options = PureBasic 5.42 LTS (Windows - x64)
-; CursorPosition = 303
-; FirstLine = 289
+; CursorPosition = 370
+; FirstLine = 355
 ; Folding = ----
 ; EnableUnicode
 ; EnableXP

@@ -53,7 +53,7 @@ Procedure About_Editor_Fill()
   
   SetGadgetFont(About\Editor, FontID(About_Font))
   
-  AddGadgetItem(About\Editor, -1, "2048")
+  AddGadgetItem(About\Editor, -1, #Software_Name + " V"+StrF(#Version*0.001,2))
   AddGadgetItem(About\Editor, -1, "")
   AddGadgetItem(About\Editor, -1, "Created with PureBasic")
   AddGadgetItem(About\Editor, -1, "")
@@ -164,8 +164,8 @@ EndProcedure
 
 ; ##################################################### Data Sections ###############################################
 
-; IDE Options = PureBasic 5.30 Beta 1 (Windows - x64)
-; CursorPosition = 72
+; IDE Options = PureBasic 5.42 LTS (Windows - x64)
+; CursorPosition = 55
 ; FirstLine = 27
 ; Folding = --
 ; EnableUnicode
