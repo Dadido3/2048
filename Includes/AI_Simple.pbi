@@ -180,7 +180,7 @@ Procedure.d AI_Simple_Rate_Chain(Array Field.i(2), X, Y, Direction)
     If i = 0
       Current_Value = Field(ix,iy)
     Else
-      If Field(ix,iy) > Current_Value
+      If Field(ix,iy) > Current_Value Or Field(ix,iy) = 0
         Break
       EndIf
       Current_Value = Field(ix,iy)
@@ -458,8 +458,8 @@ AI_Add("Simple", @AI_Simple_Do())
 ; ##################################################### Data Sections ###############################################
 
 ; IDE Options = PureBasic 5.30 Beta 1 (Windows - x64)
-; CursorPosition = 371
-; FirstLine = 324
+; CursorPosition = 184
+; FirstLine = 150
 ; Folding = -
 ; EnableUnicode
 ; EnableXP

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://www.purebasic.com/namespace" version="1.0" creator="PureBasic 5.30 Beta 1 (Windows - x64)">
+<project xmlns="http://www.purebasic.com/namespace" version="1.0" creator="PureBasic 5.42 LTS (Windows - x64)">
   <section name="config">
     <options closefiles="1" openmode="0" name="2048"/>
   </section>
   <section name="data">
     <explorer view="" pattern="0"/>
     <log show="1"/>
-    <lastopen date="2014-06-08 22:42" user="David Vogel" host="DAVIDS"/>
+    <lastopen date="2016-07-02 13:25" user="David Vogel" host="DAVIDS"/>
   </section>
   <section name="files">
     <file name="2048.pb">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="+"/>
-      <fingerprint md5="5e968a84c38de5f5262fe4d6bb1a8602"/>
+      <fingerprint md5="520f74d77b90813672ed5c9b68706d00"/>
     </file>
     <file name="Includes\About.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="0" panelstate="++"/>
@@ -28,7 +28,7 @@
     </file>
     <file name="Includes\AI_Simple.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
-      <fingerprint md5="a4df8b996f74467735f22548be5f68b9"/>
+      <fingerprint md5="dd0724f5f4557ffe6bab4c95b819d0ec"/>
     </file>
     <file name="Includes\AI_WorstCase.pbi">
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
@@ -38,16 +38,21 @@
       <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
       <fingerprint md5="1f7db02597cad135552f06b8de4795f6"/>
     </file>
+    <file name="Includes\Helper.pbi">
+      <config load="0" scan="1" panel="1" warn="1" lastopen="1" panelstate="++"/>
+      <fingerprint md5="1a9f1574c1303fdda7583f27a80cd22c"/>
+    </file>
   </section>
   <section name="targets">
-    <target name="Standard-Ziel" enabled="1" default="1">
+    <target name="x86" enabled="1" default="1">
       <inputfile value="2048.pb"/>
-      <outputfile value="2048.exe"/>
-      <compiler version="PureBasic 5.30 Beta 1 (Windows - x86)"/>
-      <executable value="2048.exe"/>
+      <outputfile value="Distribution\Windows\x86\2048.exe"/>
+      <compiler version="PureBasic 5.42 LTS (Windows - x86)"/>
+      <executable value="Distribution\Windows\x86\2048.exe"/>
       <options unicode="1" thread="1" xpskin="1" user="1" onerror="1"/>
-      <compilecount enable="1" value="447"/>
-      <buildcount enable="1" value="4"/>
+      <icon enable="1">Data\Icons\2048.ico</icon>
+      <compilecount enable="1" value="528"/>
+      <buildcount enable="1" value="7"/>
     </target>
   </section>
 </project>

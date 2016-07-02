@@ -1,4 +1,4 @@
-﻿
+﻿UseCRC32Fingerprint()
 UsePNGImageDecoder()
 
 EnableExplicit
@@ -89,9 +89,9 @@ Structure Game_Animation
   Blend_State_New.d   ; Blending between previous game state (0) and new game state (1) for new tiles
   Blend_State_Move.d  ; Blending between previous game state (0) and new game state (1) for moving tiles
   
-  New_Tile.Tile
-  Array Transition.Tile(#Field_Size, #Field_Size)      ; Coordinates of the tile in a previous game state
-  Array Additional_Tile.Tile(#Field_Size, #Field_Size) ; Additional tiles to be shown, which were merged in a previous state
+  Array Transition.Tile(#Field_Size, #Field_Size)       ; Coordinates of the tile in a previous game state
+  Array New.l(#Field_Size, #Field_Size)                 ; Array of new tiles, if #True the zoom animation will be shown
+  Array Additional_Tile.Tile(#Field_Size, #Field_Size)  ; Additional tiles to be shown, which were merged in a previous state
 EndStructure
 
 Structure Game
@@ -155,13 +155,14 @@ Declare   Field_Check_Direction(Array Field.i(2), Direction)
 Declare   Gamelogic_Move(Direction)
 Declare   Gamelogic_Restart()
 
+Declare   Main()
+
 ; ##################################################### Macros ######################################################
 
-Macro Line(x, y, Width, Height, Color)
-  LineXY((x), (y), (x)+(Width), (y)+(Height), (Color))
-EndMacro
-
 ; ##################################################### Includes ####################################################
+
+XIncludeFile "Includes/Helper.pbi"
+UseModule Helper
 
 XIncludeFile "Includes/About.pbi"
 XIncludeFile "Includes/AI_Settings.pbi"
@@ -173,14 +174,6 @@ XIncludeFile "Includes/AI_WorstCase.pbi"
 XIncludeFile "Includes/AI_Random.pbi"
 
 ; ##################################################### Procedures ##################################################
-
-Procedure.s SHGetFolderPath(CSIDL)
-  Protected *String = AllocateMemory(#MAX_PATH+1)
-  SHGetFolderPath_(0, CSIDL, #Null, 0, *String)
-  Protected String.s = PeekS(*String)
-  FreeMemory(*String)
-  ProcedureReturn String
-EndProcedure
 
 Procedure AI_Change(Number)
   If SelectElement(AI(), Number)
@@ -288,6 +281,8 @@ Procedure Main_Window_Event_Timer()
       EndIf
       UnlockMutex(AI_Main\Mutex_ID)
       
+      Main()
+      
   EndSelect
 EndProcedure
 
@@ -296,13 +291,20 @@ Procedure Main_Window_Event_Menu()
   Protected Event_Gadget = EventGadget()
   Protected Event_Type = EventType()
   Protected Event_Menu = EventMenu()
-  Protected AI_List.s
+  Protected AI_List.s, Seed.s
   
   Select Event_Menu
     Case #Menu_Restart : Gamelogic_Restart()
     Case #Menu_Restart_With_Seed
       AI_Main\State = #AI_State_Stop
-      AI_Main\Restart_With_Seed = Val(InputRequester("Restart", "Enter the new seed", ""))
+      Seed.s = InputRequester("Restart", "Enter the new seed", "")
+      ; #### Check for one-to-one correspondence (If true, the seed string is an integer)
+      If Str(Val(Seed)) = Seed
+        AI_Main\Restart_With_Seed = Val(Seed)
+      Else
+        AI_Main\Restart_With_Seed = Val("$"+StringFingerprint(Seed, #PB_Cipher_CRC32))
+      EndIf
+      
       RandomSeed(AI_Main\Restart_With_Seed)
       Gamelogic_Restart()
     Case #Menu_Exit : Main\Quit = #True
@@ -471,7 +473,7 @@ Procedure Tile_Draw(X.d, Y.d, ix, iy, Value.i)
     Default     : Color_Back = RGB(10,10,10)    : Color_Text = RGB(205,193,180)
   EndSelect
   
-  If ix = Game\Animation\New_Tile\X And iy = Game\Animation\New_Tile\Y
+  If ix >= 0 And iy >= 0 And Game\Animation\New(ix, iy)
     Scaling = 0.8 * Game\Animation\Blend_State_New + 0.2
     If Game\Animation\Blend_State_New = 0
       ProcedureReturn
@@ -602,8 +604,7 @@ Procedure Gamelogic_Place_Random()
     
     ;Game\Field(Empty_Tile()\X,Empty_Tile()\Y) = 3
     
-    Game\Animation\New_Tile\X = Empty_Tile()\X
-    Game\Animation\New_Tile\Y = Empty_Tile()\Y
+    Game\Animation\New(Empty_Tile()\X, Empty_Tile()\Y) = #True
     Game\Animation\Blend_State_New = 0
     Main_Window\Canvas_Info_Redraw = #True
     Main_Window\Canvas_Field_Redraw = #True
@@ -625,14 +626,20 @@ Procedure Gamelogic_Move_Helper(Direction)
   
   LockMutex(AI_Main\Mutex_ID)
   
-  ; #### Restart transition array for animations
+  ; #### Reset transition array for animations
   For ix = 0 To #Field_Size-1
     For iy = 0 To #Field_Size-1
       Game\Animation\Transition(ix,iy)\X = ix
       Game\Animation\Transition(ix,iy)\Y = iy
     Next
   Next
-  ; #### Restart additional array for animations
+  ; #### Reset new tile array for animations
+  For ix = 0 To #Field_Size-1
+    For iy = 0 To #Field_Size-1
+      Game\Animation\New(ix,iy) = #False
+    Next
+  Next
+  ; #### Reset additional array for animations
   For ix = 0 To #Field_Size-1
     For iy = 0 To #Field_Size-1
       Game\Animation\Additional_Tile(ix,iy)\Value = 0
@@ -757,21 +764,27 @@ Procedure Gamelogic_Restart()
   
   LockMutex(AI_Main\Mutex_ID)
   
-  ; #### Restart transition array for animations
+  ; #### Initialize transition array for animations
   For ix = 0 To #Field_Size-1
     For iy = 0 To #Field_Size-1
       Game\Animation\Transition(ix,iy)\X = ix
       Game\Animation\Transition(ix,iy)\Y = iy
     Next
   Next
-  ; #### Restart additional array for animations
+  ; #### Initialize new tile array for animations
+  For ix = 0 To #Field_Size-1
+    For iy = 0 To #Field_Size-1
+      Game\Animation\New(ix,iy) = #False
+    Next
+  Next
+  ; #### Initialize additional array for animations
   For ix = 0 To #Field_Size-1
     For iy = 0 To #Field_Size-1
       Game\Animation\Additional_Tile(ix,iy)\Value = 0
     Next
   Next
   
-  ; #### Restart Field
+  ; #### Initialize Field
   For ix = 0 To #Field_Size-1
     For iy = 0 To #Field_Size-1
       Game\Field(ix,iy) = 0
@@ -787,6 +800,8 @@ Procedure Gamelogic_Restart()
   
   UnlockMutex(AI_Main\Mutex_ID)
   
+  ; #### Game starts with two random tiles
+  Gamelogic_Place_Random()
   Gamelogic_Place_Random()
 EndProcedure
 
@@ -823,24 +838,7 @@ Procedure Configuration_Load(Filename.s)
   ClosePreferences()
 EndProcedure
 
-; ##################################################### Initialisation ##############################################
-
-Configuration_Load(SHGetFolderPath(#CSIDL_APPDATA)+"\D3\2048\Settings.txt")
-
-AI_Main\Mutex_ID = CreateMutex()
-AI_Main\Thread_ID = CreateThread(@AI_Thread(), 0)
-
-Main_Window_Open()
-
-;Tuner_Window_Open()
-
-Gamelogic_Restart()
-
-; ##################################################### Main ########################################################
-
-Repeat
-  
-  WaitWindowEvent(10)
+Procedure Main()
   
   If Main_Window\Canvas_Info_Redraw
     Main_Window\Canvas_Info_Redraw = #False
@@ -856,16 +854,42 @@ Repeat
   AI_Settings_Main()
   Tuner_Main()
   
+EndProcedure
+
+; ##################################################### Initialisation ##############################################
+
+Configuration_Load(GetPreferencesDirectory() + "D3\2048\Settings.txt")
+
+AI_Main\Mutex_ID = CreateMutex()
+AI_Main\Thread_ID = CreateThread(@AI_Thread(), 0)
+
+Main_Window_Open()
+
+;Tuner_Window_Open()
+
+Gamelogic_Restart()
+
+; ##################################################### Main ########################################################
+
+Repeat
+  
+  If WaitWindowEvent(10)
+    While WindowEvent()
+    Wend
+  EndIf
+  
+  ; ################### Main functions of all modules
+  
+  Main()
+  
 Until Main\Quit
 
 ; ##################################################### End #########################################################
 
 WaitThread(AI_Main\Thread_ID)
 
-CreateDirectory(SHGetFolderPath(#CSIDL_APPDATA)+"\D3")
-CreateDirectory(SHGetFolderPath(#CSIDL_APPDATA)+"\D3\2048")
-
-Configuration_Save(SHGetFolderPath(#CSIDL_APPDATA)+"\D3\2048\Settings.txt")
+MakeSureDirectoryPathExists(GetPreferencesDirectory() + "D3\2048\")
+Configuration_Save(GetPreferencesDirectory() + "D3\2048\Settings.txt")
 
 ; ##################################################### Data Sections ###############################################
 
@@ -878,9 +902,9 @@ DataSection
   Icon_AI_Step:           : IncludeBinary "Data/Icons/AI_Step.png"
   Icon_AI_Settings:       : IncludeBinary "Data/Icons/AI_Settings.png"
 EndDataSection
-; IDE Options = PureBasic 5.30 Beta 1 (Windows - x64)
-; CursorPosition = 169
-; FirstLine = 127
+; IDE Options = PureBasic 5.42 LTS (Windows - x64)
+; CursorPosition = 303
+; FirstLine = 289
 ; Folding = ----
 ; EnableUnicode
 ; EnableXP
